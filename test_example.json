@@ -1,0 +1,257 @@
+{
+  "test_queries": [
+    {
+      "name": "order_status_simple",
+      "description": "Basic order status inquiry",
+      "input": {
+        "customer_name": "Alice Johnson",
+        "email": "alice@example.com",
+        "query": "Where is my order #789? I ordered it last week.",
+        "priority": "medium",
+        "ticket_id": "T101"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT", 
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "resolved",
+        "escalation": false,
+        "solution_type": "provide_tracking"
+      }
+    },
+    {
+      "name": "refund_with_escalation",
+      "description": "Refund request requiring human intervention",
+      "input": {
+        "customer_name": "Bob Wilson",
+        "email": "",
+        "query": "My order #234 arrived completely damaged! This is unacceptable. I demand a full refund immediately and compensation for my trouble!",
+        "priority": "urgent",
+        "ticket_id": "T102"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "escalated",
+        "escalation": true,
+        "reason": "Financial decision + high emotion"
+      }
+    },
+    {
+      "name": "technical_support",
+      "description": "Product help inquiry",
+      "input": {
+        "customer_name": "Carol Davis",
+        "email": "carol@techcorp.com",
+        "query": "I can't get my new device to connect to WiFi. I've tried everything in the manual. Model is XR-500.",
+        "priority": "high",
+        "ticket_id": "T103"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "resolved",
+        "escalation": false,
+        "solution_type": "technical_guidance"
+      }
+    },
+    {
+      "name": "billing_inquiry",
+      "description": "Billing and payment question",
+      "input": {
+        "customer_name": "David Lee",
+        "email": "david.lee@email.com",
+        "query": "I was charged twice for order #567. Please check and fix this billing error.",
+        "priority": "high",
+        "ticket_id": "T104"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "escalated",
+        "escalation": true,
+        "reason": "Financial transaction issue"
+      }
+    },
+    {
+      "name": "general_inquiry",
+      "description": "Simple information request",
+      "input": {
+        "customer_name": "Emma Brown",
+        "email": "emma@gmail.com",
+        "query": "What's your return policy for electronics?",
+        "priority": "low",
+        "ticket_id": "T105"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "resolved",
+        "escalation": false,
+        "solution_type": "policy_information"
+      }
+    },
+    {
+      "name": "missing_information",
+      "description": "Query with multiple missing fields",
+      "input": {
+        "customer_name": "",
+        "email": "",
+        "query": "Help with my order",
+        "priority": "",
+        "ticket_id": "T106"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "clarification_needed": true,
+        "multiple_asks": true
+      }
+    },
+    {
+      "name": "complex_multi_issue",
+      "description": "Multiple issues in single query",
+      "input": {
+        "customer_name": "Frank Martinez",
+        "email": "frank@business.com",
+        "query": "Order #890 has wrong items, shipping was delayed, and I was overcharged. Also need to update my shipping address for future orders.",
+        "priority": "urgent",
+        "ticket_id": "T107"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "escalated",
+        "escalation": true,
+        "reason": "Multiple complex issues"
+      }
+    },
+    {
+      "name": "positive_feedback",
+      "description": "Positive feedback message",
+      "input": {
+        "customer_name": "Grace Kim",
+        "email": "grace@happy.com",
+        "query": "Just wanted to say my order #999 arrived perfectly and I love the product! Great service!",
+        "priority": "low",
+        "ticket_id": "T108"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "resolved",
+        "escalation": false,
+        "solution_type": "acknowledgment",
+        "sentiment": "positive"
+      }
+    },
+    {
+      "name": "urgent_delivery",
+      "description": "Urgent delivery request",
+      "input": {
+        "customer_name": "Henry Taylor",
+        "email": "henry@urgent.net",
+        "query": "Order #111 MUST arrive by tomorrow for an important event! Can you expedite shipping? This is critical!",
+        "priority": "urgent",
+        "ticket_id": "T109"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "escalated",
+        "escalation": true,
+        "reason": "Urgent shipping modification"
+      }
+    },
+    {
+      "name": "product_comparison",
+      "description": "Product information request",
+      "input": {
+        "customer_name": "Iris Chen",
+        "email": "iris@shopper.com",
+        "query": "What's the difference between Model A100 and Model B200? Which one is better for home use?",
+        "priority": "medium",
+        "ticket_id": "T110"
+      },
+      "expected_flow": [
+        "INTAKE", "UNDERSTAND", "PREPARE", "ASK", "WAIT",
+        "RETRIEVE", "DECIDE", "UPDATE", "CREATE", "DO", "COMPLETE"
+      ],
+      "expected_outcome": {
+        "status": "resolved",
+        "escalation": false,
+        "solution_type": "product_information"
+      }
+    }
+  ],
+  "test_scenarios": {
+    "happy_path": {
+      "description": "Everything works perfectly",
+      "characteristics": [
+        "All required information provided",
+        "Clear query intent",
+        "Simple resolution available",
+        "High confidence score (>90)"
+      ]
+    },
+    "escalation_path": {
+      "description": "Requires human intervention",
+      "triggers": [
+        "Financial decisions (refunds, billing errors)",
+        "Complex technical issues",
+        "High emotion/anger in query",
+        "Low confidence score (<90)",
+        "Multiple complex issues"
+      ]
+    },
+    "clarification_path": {
+      "description": "Missing information flow",
+      "triggers": [
+        "Missing email",
+        "Vague query",
+        "Missing order number",
+        "Incomplete customer info"
+      ]
+    }
+  },
+  "validation_rules": {
+    "stage_transitions": [
+      "Every query must pass through INTAKE",
+      "UNDERSTAND always follows INTAKE",
+      "COMPLETE is always the final stage",
+      "State variables must persist across stages",
+      "Each stage must log its execution"
+    ],
+    "mcp_routing": [
+      "Text processing goes to COMMON",
+      "Database queries go to ATLAS",
+      "AI reasoning goes to COMMON",
+      "External APIs go to ATLAS",
+      "State management is internal"
+    ],
+    "escalation_criteria": [
+      "Solution score < 90",
+      "Financial impact > $100",
+      "Customer explicitly requests human",
+      "Complex technical issues",
+      "Legal/compliance matters"
+    ]
+  }
+}

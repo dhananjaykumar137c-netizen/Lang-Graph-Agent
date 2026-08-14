@@ -1,0 +1,244 @@
+agent:
+  name: "Langie"
+  type: "customer_support"
+  personality: |
+    You are Langie — a structured and logical Lang Graph Agent.
+    - You think in stages: each node represents a clear phase of the workflow.
+    - You carefully carry forward state variables from one stage to the next.
+    - You always know whether to execute sequentially (deterministic) or to choose dynamically (non-deterministic).
+    - You orchestrate MCP clients to call either Atlas or Common servers as needed.
+    - You log every decision clearly and output a final structured payload.
+
+# Input Schema Definition
+input_schema:
+  type: "object"
+  required:
+    - customer_name
+    - query
+    - ticket_id
+  properties:
+    customer_name:
+      type: "string"
+      description: "Customer's full name"
+    email:
+      type: "string"
+      format: "email"
+      description: "Customer's email address"
+    query:
+      type: "string"
+      description: "Customer's support query"
+    priority:
+      type: "string"
+      enum: ["low", "medium", "high", "urgent"]
+      default: "medium"
+    ticket_id:
+      type: "string"
+      pattern: "^T[0-9]+$"
+      description: "Unique ticket identifier"
+
+# MCP Server Configuration
+mcp_servers:
+  COMMON:
+    description: "Internal AI processing - no external data dependencies"
+    endpoint: "http://localhost:8001"
+    capabilities:
+      - text_processing
+      - ai_reasoning
+      - calculations
+      - response_generation
+  
+  ATLAS:
+    description: "External system integrations - database and API calls"
+    endpoint: "http://localhost:8002"
+    capabilities:
+      - database_queries
+      - external_apis
+      - crm_integration
+      - notification_services
+
+# Stage Definitions
+stages:
+  - stage_number: 1
+    name: "INTAKE"
+    emoji: "📥"
+    mode: "deterministic"
+    description: "Accept and validate initial payload"
+    abilities:
+      - name: "accept_payload"
+        server: "STATE"
+    example_prompt: "Validate and store the initial customer request"
+    
+  - stage_number: 2
+    name: "UNDERSTAND"
+    emoji: "🧠"
+    mode: "deterministic"
+    description: "Parse request and extract entities"
+    abilities:
+      - name: "parse_request_text"
+        server: "COMMON"
+      - name: "extract_entities"
+        server: "ATLAS"
+    example_prompt: "Parse the customer query to understand intent and extract key entities"
+    
+  - stage_number: 3
+    name: "PREPARE"
+    emoji: "🛠"
+    mode: "deterministic"
+    description: "Normalize and enrich data"
+    abilities:
+      - name: "normalize_fields"
+        server: "COMMON"
+      - name: "enrich_records"
+        server: "ATLAS"
+      - name: "add_flags_calculations"
+        server: "COMMON"
+    example_prompt: "Normalize extracted data and enrich with customer history"
+    
+  - stage_number: 4
+    name: "ASK"
+    emoji: "❓"
+    mode: "deterministic"
+    description: "Request clarification if needed"
+    abilities:
+      - name: "clarify_question"
+        server: "ATLAS"
+    example_prompt: "If critical information is missing, ask the customer for clarification"
+    
+  - stage_number: 5
+    name: "WAIT"
+    emoji: "⏳"
+    mode: "deterministic"
+    description: "Wait for and process customer response"
+    abilities:
+      - name: "extract_answer"
+        server: "ATLAS"
+      - name: "store_answer"
+        server: "STATE"
+    example_prompt: "Wait for customer response and extract the answer"
+    
+  - stage_number: 6
+    name: "RETRIEVE"
+    emoji: "📚"
+    mode: "deterministic"
+    description: "Search knowledge base and retrieve relevant data"
+    abilities:
+      - name: "knowledge_base_search"
+        server: "ATLAS"
+      - name: "store_data"
+        server: "STATE"
+    example_prompt: "Search knowledge base for relevant information about the query"
+    
+  - stage_number: 7
+    name: "DECIDE"
+    emoji: "⚖️"
+    mode: "non-deterministic"
+    description: "Evaluate solutions and decide on action"
+    abilities:
+      - name: "solution_evaluation"
+        server: "COMMON"
+      - name: "escalation_decision"
+        server: "ATLAS"
+      - name: "update_payload"
+        server: "STATE"
+    example_prompt: "Evaluate possible solutions, score them, and decide if escalation is needed"
+    
+  - stage_number: 8
+    name: "UPDATE"
+    emoji: "🔄"
+    mode: "deterministic"
+    description: "Update ticket status and metadata"
+    abilities:
+      - name: "update_ticket"
+        server: "ATLAS"
+      - name: "close_ticket"
+        server: "ATLAS"
+    example_prompt: "Update the ticket status based on the decision made"
+    
+  - stage_number: 9
+    name: "CREATE"
+    emoji: "✍️"
+    mode: "deterministic"
+    description: "Generate customer response"
+    abilities:
+      - name: "response_generation"
+        server: "COMMON"
+    example_prompt: "Generate a professional and helpful response for the customer"
+    
+  - stage_number: 10
+    name: "DO"
+    emoji: "🏃"
+    mode: "deterministic"
+    description: "Execute actions and send notifications"
+    abilities:
+      - name: "execute_api_calls"
+        server: "ATLAS"
+      - name: "trigger_notifications"
+        server: "ATLAS"
+    example_prompt: "Execute all necessary API calls and send notifications"
+    
+  - stage_number: 11
+    name: "COMPLETE"
+    emoji: "✅"
+    mode: "deterministic"
+    description: "Finalize and output results"
+    abilities:
+      - name: "output_payload"
+        server: "STATE"
+    example_prompt: "Compile and output the final structured payload"
+
+# Workflow Rules
+workflow_rules:
+  - rule: "Sequential Execution"
+    description: "Deterministic stages execute abilities in defined order"
+  - rule: "State Persistence"
+    description: "All state variables persist across stages"
+  - rule: "Escalation Threshold"
+    description: "Solutions scoring <90 trigger human escalation"
+  - rule: "Clarification Loop"
+    description: "ASK-WAIT stages can loop until required info obtained"
+  - rule: "Audit Trail"
+    description: "Every stage logs actions to stage_history"
+
+# Output Schema
+output_schema:
+  type: "object"
+  properties:
+    ticket_id:
+      type: "string"
+    status:
+      type: "string"
+      enum: ["resolved", "escalated", "pending", "closed"]
+    customer:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        email:
+          type: "string"
+    solution:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+        description:
+          type: "string"
+        confidence_score:
+          type: "integer"
+    response_sent:
+      type: "boolean"
+    escalated:
+      type: "boolean"
+    processing_time:
+      type: "string"
+    actions_taken:
+      type: "array"
+      items:
+        type: "string"
+    notifications_sent:
+      type: "array"
+      items:
+        type: "string"
+    stages_completed:
+      type: "array"
+      items:
+        type: "string"
